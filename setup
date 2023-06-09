@@ -94,7 +94,7 @@ download_jar() {
 download_dependencies() {
   which ant > /dev/null || $install_package ant
   which wget > /dev/null || $install_package wget
-  M2_VERSION="3.9.1"
+  M2_VERSION="3.9.2"
   wget https://dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz
   tar -zxvf apache-maven-${M2_VERSION}-bin.tar.gz
   mv apache-maven-${M2_VERSION} /opt/maven
@@ -126,8 +126,8 @@ download_dependencies() {
                   commons-cli:commons-cli:1.5.0 \
                   commons-codec:commons-codec:1.15 \
                   commons-logging:commons-logging:1.2 \
-                  commons-logging:commons-logging-adapters:1.2 \
-                  commons-logging:commons-logging-api:1.2 \
+                  commons-logging:commons-logging-adapters:1.1 \
+                  commons-logging:commons-logging-api:1.1 \
                   org.apache.commons:commons-lang3:3.12.0 \
                   org.apache.logging.log4j:log4j-1.2-api:2.17.1 \
                   org.apache.logging.log4j:log4j-api:2.17.1 \
