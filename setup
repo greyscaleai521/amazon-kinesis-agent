@@ -68,11 +68,31 @@ fail() {
   exit 1
 }
 
+download_jar_s3() {
+  group_id=$1
+  artifact_id=$2
+  version=$3
+  s3_bucket=$4
+  s3_prefix="repo1.maven.org/maven2"
+  path=${group_id//.//}
+  jar_name=$artifact_id-$version.jar
+  tmp_dest=$(mktemp -u)
+  jar_dest=$dependencies_dir/$jar_name
+  s3_url=${s3_bucket}/${s3_prefix}/${path}/${artifact_id}/${version}/${jar_name}
+  
+  # file exists? then don't download it!
+  [[ -f ${jar_dest} ]] && return
+
+  # download the file to a temp location, then if move it here if successful
+  echo "Downloading $jar_name ($s3_url) to ${dependencies_dir}..."
+  aws s3 cp ${s3_url} ${dependencies_dir}/
+}
+
 download_jar() {
   group_id=$1
   artifact_id=$2
   version=$3
-  prefix="http://search.maven.org/remotecontent?filepath="
+  prefix="https://repo1.maven.org/maven2/"
   path=${group_id//.//}
   jar_name=$artifact_id-$version.jar
   tmp_dest=$(mktemp -u)
@@ -94,18 +114,25 @@ download_jar() {
 download_dependencies() {
   which ant > /dev/null || $install_package ant
   which wget > /dev/null || $install_package wget
+  s3_bucket="s3://gsai-s3-common-all-install-binaries/maven"
+  M2_VERSION="3.9.2"
+  #wget https://dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz
+  aws s3 cp ${s3_bucket}/dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz .
+  tar -zxvf apache-maven-${M2_VERSION}-bin.tar.gz
+  mv apache-maven-${M2_VERSION} /opt/maven
+  M2_HOME=/opt/maven
   
   install -d ${dependencies_dir}
   
   echo "Downloading dependencies ..."
-  aws_java_sdk_version="1.12.321"
+  aws_java_sdk_version="1.12.416"
   
   remote_mvn_pkg="com.amazonaws:aws-java-sdk-core:${aws_java_sdk_version} \
                   com.amazonaws:aws-java-sdk-kinesis:${aws_java_sdk_version} \
                   com.amazonaws:aws-java-sdk-cloudwatch:${aws_java_sdk_version} \
                   com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_version} \
                   com.amazonaws:aws-java-sdk-ec2:${aws_java_sdk_version} \
-                  com.fasterxml.jackson.core:jackson-annotations:2.14.0-rc2\
+                  com.fasterxml.jackson.core:jackson-annotations:2.14.0-rc2 \
                   com.fasterxml.jackson.core:jackson-core:2.14.0-rc2 \
                   com.fasterxml.jackson.core:jackson-databind:2.14.0-rc2 \
                   com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.14.0-rc2 \
@@ -121,8 +148,8 @@ download_dependencies() {
                   commons-cli:commons-cli:1.5.0 \
                   commons-codec:commons-codec:1.15 \
                   commons-logging:commons-logging:1.2 \
-                  commons-logging:commons-logging-adapters:1.2 \
-                  commons-logging:commons-logging-api:1.2 \
+                  commons-logging:commons-logging-adapters:1.1 \
+                  commons-logging:commons-logging-api:1.1 \
                   org.apache.commons:commons-lang3:3.12.0 \
                   org.apache.logging.log4j:log4j-1.2-api:2.17.1 \
                   org.apache.logging.log4j:log4j-api:2.17.1 \
@@ -136,7 +163,8 @@ download_dependencies() {
   
   for package in ${remote_mvn_pkg}
   do
-   download_jar $(echo $package | tr : " ")
+   #${M2_HOME}/bin/mvn dependency:get -Dartifact=$package:jar-with-dependencies
+   download_jar_s3 $(echo $package | tr : " ") "${s3_bucket}"
   done
 }
 
