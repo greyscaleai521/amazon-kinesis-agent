@@ -117,7 +117,7 @@ download_dependencies() {
   s3_bucket="s3://gsai-s3-common-all-install-binaries/maven"
   M2_VERSION="3.9.2"
   #wget https://dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz
-  aws s3 cp ${s3_bucket}/dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz .
+  aws s3 cp --no-progress --only-show-errors ${s3_bucket}/dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz .
   tar -zxvf apache-maven-${M2_VERSION}-bin.tar.gz
   mv apache-maven-${M2_VERSION} /opt/maven
   M2_HOME=/opt/maven
@@ -161,12 +161,14 @@ download_dependencies() {
                   joda-time:joda-time:2.12.5 \
                   org.projectlombok:lombok:1.18.28 \
                   org.testng:testng:7.8.0"
-  
-  for package in ${remote_mvn_pkg}
-  do
-   #${M2_HOME}/bin/mvn dependency:get -Dartifact=$package:jar-with-dependencies
-   download_jar_s3 $(echo $package | tr : " ") "${s3_bucket}"
-  done
+
+  aws s3 cp --no-progress --only-show-errors --recursive ${s3_bucket}/kinesisagent_dependencies/2023-06/ ${dependencies_dir}/
+
+  # for package in ${remote_mvn_pkg}
+  # do
+  #  #${M2_HOME}/bin/mvn dependency:get -Dartifact=$package:jar-with-dependencies
+  #  download_jar_s3 $(echo $package | tr : " ") "${s3_bucket}"
+  # done
 }
 
 do_uninstall () {
