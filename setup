@@ -115,55 +115,56 @@ download_dependencies() {
   which ant > /dev/null || $install_package ant
   which wget > /dev/null || $install_package wget
   s3_bucket="s3://gsai-s3-common-all-install-binaries/maven"
-  M2_VERSION="3.9.2"
-  #wget https://dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz
-  aws s3 cp --no-progress --only-show-errors ${s3_bucket}/dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz .
-  tar -zxvf apache-maven-${M2_VERSION}-bin.tar.gz
-  mv apache-maven-${M2_VERSION} /opt/maven
-  M2_HOME=/opt/maven
+  # M2_VERSION="3.9.2"
+  # #wget https://dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz
+  # aws s3 cp --no-progress --only-show-errors ${s3_bucket}/dlcdn.apache.org/maven/maven-3/${M2_VERSION}/binaries/apache-maven-${M2_VERSION}-bin.tar.gz .
+  # tar -zxvf apache-maven-${M2_VERSION}-bin.tar.gz
+  # mv apache-maven-${M2_VERSION} /opt/maven
+  # M2_HOME=/opt/maven
   
   install -d ${dependencies_dir}
   
-  echo "Downloading dependencies ..."
-  aws_java_sdk_version="1.12.486"
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Downloading dependencies ..."
+  # aws_java_sdk_version="1.12.486"
   
-  remote_mvn_pkg="com.amazonaws:aws-java-sdk-core:${aws_java_sdk_version} \
-                  com.amazonaws:aws-java-sdk-kinesis:${aws_java_sdk_version} \
-                  com.amazonaws:aws-java-sdk-cloudwatch:${aws_java_sdk_version} \
-                  com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_version} \
-                  com.amazonaws:aws-java-sdk-ec2:${aws_java_sdk_version} \
-                  com.fasterxml.jackson.core:jackson-annotations:2.15.1 \
-                  com.fasterxml.jackson.core:jackson-core:2.15.1 \
-                  com.fasterxml.jackson.core:jackson-databind:2.15.1 \
-                  com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.15.1 \
-                  com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.1 \
-                  com.google.code.findbugs:jsr305:3.0.2 \
-                  com.google.guava:guava:32.0.1-jre \
-                  org.apache.httpcomponents:httpclient:4.5.14 \
-                  org.apache.httpcomponents:httpclient-cache:4.5.14 \
-                  org.apache.httpcomponents:httpmime:4.5.14 \
-                  org.apache.httpcomponents:httpcore:4.4.16 \
-                  org.apache.httpcomponents:httpcore-ab:4.4.16 \
-                  org.apache.httpcomponents:httpcore-nio:4.4.16 \
-                  commons-cli:commons-cli:1.5.0 \
-                  commons-codec:commons-codec:1.15 \
-                  commons-logging:commons-logging:1.2 \
-                  commons-logging:commons-logging-adapters:1.1 \
-                  commons-logging:commons-logging-api:1.1 \
-                  org.apache.commons:commons-lang3:3.12.0 \
-                  org.apache.logging.log4j:log4j-1.2-api:2.20.0 \
-                  org.apache.logging.log4j:log4j-api:2.20.0 \
-                  org.apache.logging.log4j:log4j-core:2.20.0   \
-                  org.apache.logging.log4j:log4j-slf4j-impl:2.20.0 \
-                  org.slf4j:slf4j-api:1.7.36 \
-                  com.beust:jcommander:1.82 \
-                  org.xerial:sqlite-jdbc:3.42.0.0 \
-                  joda-time:joda-time:2.12.5 \
-                  org.projectlombok:lombok:1.18.28 \
-                  org.testng:testng:7.8.0"
+  # remote_mvn_pkg="com.amazonaws:aws-java-sdk-core:${aws_java_sdk_version} \
+  #                 com.amazonaws:aws-java-sdk-kinesis:${aws_java_sdk_version} \
+  #                 com.amazonaws:aws-java-sdk-cloudwatch:${aws_java_sdk_version} \
+  #                 com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_version} \
+  #                 com.amazonaws:aws-java-sdk-ec2:${aws_java_sdk_version} \
+  #                 com.fasterxml.jackson.core:jackson-annotations:2.15.1 \
+  #                 com.fasterxml.jackson.core:jackson-core:2.15.1 \
+  #                 com.fasterxml.jackson.core:jackson-databind:2.15.1 \
+  #                 com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.15.1 \
+  #                 com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.1 \
+  #                 com.google.code.findbugs:jsr305:3.0.2 \
+  #                 com.google.guava:guava:32.0.1-jre \
+  #                 org.apache.httpcomponents:httpclient:4.5.14 \
+  #                 org.apache.httpcomponents:httpclient-cache:4.5.14 \
+  #                 org.apache.httpcomponents:httpmime:4.5.14 \
+  #                 org.apache.httpcomponents:httpcore:4.4.16 \
+  #                 org.apache.httpcomponents:httpcore-ab:4.4.16 \
+  #                 org.apache.httpcomponents:httpcore-nio:4.4.16 \
+  #                 commons-cli:commons-cli:1.5.0 \
+  #                 commons-codec:commons-codec:1.15 \
+  #                 commons-logging:commons-logging:1.2 \
+  #                 commons-logging:commons-logging-adapters:1.1 \
+  #                 commons-logging:commons-logging-api:1.1 \
+  #                 org.apache.commons:commons-lang3:3.12.0 \
+  #                 org.apache.logging.log4j:log4j-1.2-api:2.20.0 \
+  #                 org.apache.logging.log4j:log4j-api:2.20.0 \
+  #                 org.apache.logging.log4j:log4j-core:2.20.0   \
+  #                 org.apache.logging.log4j:log4j-slf4j-impl:2.20.0 \
+  #                 org.slf4j:slf4j-api:1.7.36 \
+  #                 com.beust:jcommander:1.82 \
+  #                 org.xerial:sqlite-jdbc:3.42.0.0 \
+  #                 joda-time:joda-time:2.12.5 \
+  #                 org.projectlombok:lombok:1.18.28 \
+  #                 org.testng:testng:7.8.0"
 
   aws s3 cp --no-progress --only-show-errors --recursive ${s3_bucket}/kinesisagent_dependencies/2023-06/ ${dependencies_dir}/
-
+  
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Downloaded dependencies ..."
   # for package in ${remote_mvn_pkg}
   # do
   #  #${M2_HOME}/bin/mvn dependency:get -Dartifact=$package:jar-with-dependencies
